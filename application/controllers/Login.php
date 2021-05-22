@@ -67,7 +67,7 @@ class Login extends CI_Controller {
 			}
 
 		} else {
-			redirect('my_profile');
+			redirect('master_jenis_kategori');
 		}
 	}
 
