@@ -1,0 +1,87 @@
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+class Register extends CI_Controller
+{
+
+	/**
+	 * Index Page for this controller.
+	 *
+	 * Maps to the following URL
+	 * 		http://example.com/index.php/welcome
+	 *	- or -
+	 * 		http://example.com/index.php/welcome/index
+	 *	- or -
+	 * Since this controller is set as the default controller in
+	 * config/routes.php, it's displayed at http://example.com/
+	 *
+	 * So any other public methods not prefixed with an underscore will
+	 * map to /index.php/welcome/<method_name>
+	 * @see https://codeigniter.com/user_guide/general/urls.html
+	 */
+
+	public function __construct()
+	{
+		parent::__construct();
+		$this->load->database();
+		$this->load->helper('url');
+		$this->load->model('m_login');
+		$this->load->library('session');
+		$this->load->library('crypt');
+	}
+
+	public function index()
+	{
+		if ($this->session->userdata('akses') == 0) {
+
+			if ($this->input->post('login')) {
+
+				$user = $this->input->post('username');
+				$pass = $this->input->post('password');
+
+				$encrypt_pass = $this->crypt->encrypt($pass, 'abcdef0123456789');
+
+				$data['user'] = $this->m_login->daftar($user, $encrypt_pass);
+
+				if ($data['user']) {
+					$session = array(
+						'id' => $data['user'][0]->id,
+						'username' => $user,
+
+					);
+					$this->session->set_userdata($session);
+					redirect('my_profile');
+				} else {
+					echo '
+						<script>
+							alert("Username or Password is Wrong. Try Again!");
+							window.location = "' . site_url() . '";
+						</script>
+					';
+				}
+			} else {
+
+				$data['header'] = 'header';
+				$data['script'] = 'script';
+				$this->load->view('register', $data);
+			}
+		} else {
+			redirect('my_profile');
+		}
+	}
+
+	function logout()
+	{
+		$session = array(
+			'akses' => 0,
+			'username' => '',
+			'nama' => '',
+			'role' => '',
+			'no_telp' => ''
+		);
+		$ses = $this->session->unset_userdata($session);
+		$this->session->sess_destroy();
+
+		redirect('login');
+	}
+}
