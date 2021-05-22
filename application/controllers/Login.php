@@ -47,7 +47,7 @@ class Login extends CI_Controller {
 							'username'=>$user, 
 						);
 					$this->session->set_userdata($session);
-					redirect('my_profile');
+					redirect('master_jenis_kategori');
 				}
 				else{
 					echo '
